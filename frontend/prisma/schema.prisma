@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String             @id @default(uuid())
+  email         String             @unique
+  passwordHash  String
+  name          String
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  healthProfile HealthProfile?
+  chatSessions  ChatSession[]
+  activities    ActivityTracking[]
+  wellnessScore WellnessScore[]
+}
+
+model HealthProfile {
+  id             String   @id @default(uuid())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String   @unique
+  age            Int?
+  gender         String?
+  medicalHistory String?
+  createdAt      DateTime @default(now())
+}
+
+model ChatSession {
+  id        String        @id @default(uuid())
+  user      User          @relation(fields: [userId], references: [id])
+  userId    String
+  title     String
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+}
+
+model ChatMessage {
+  id          String      @id @default(uuid())
+  session     ChatSession @relation(fields: [sessionId], references: [id])
+  sessionId   String
+  role        String // 'user' or 'ai'
+  content     String
+  isEmergency Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+}
+
+model ActivityTracking {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  type      String // 'hydration', 'breathing', 'stretching'
+  amount    Float?
+  duration  Int?
+  createdAt DateTime @default(now())
+}
+
+model WellnessScore {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  score        Int
+  calculatedAt DateTime @default(now())
+}
