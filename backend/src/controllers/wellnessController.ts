@@ -56,7 +56,7 @@ export const getStats = async (req: Request, res: Response) => {
 
     const stats = await prisma.activityTracking.groupBy({
       by: ['type'],
-      where: { 
+      where: {
         userId,
         createdAt: { gte: today }
       },
@@ -72,14 +72,14 @@ export const getStats = async (req: Request, res: Response) => {
     });
 
     const currentScore = await prisma.wellnessScore.findFirst({
-        where: { userId },
-        orderBy: { calculatedAt: 'desc' }
+      where: { userId },
+      orderBy: { calculatedAt: 'desc' }
     });
 
     res.json({
-        stats,
-        activities,
-        score: currentScore?.score || 100
+      stats,
+      activities,
+      score: currentScore?.score || 100
     });
   } catch (error) {
     console.error('Get stats error:', error);
