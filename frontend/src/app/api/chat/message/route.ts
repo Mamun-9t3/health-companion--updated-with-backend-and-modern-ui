@@ -53,19 +53,19 @@ export async function POST(request: Request) {
     const isEmergency = EMERGENCY_KEYWORDS.some(kw => lowerMessage.includes(kw));
 
     if (isEmergency) {
-       await prisma.chatMessage.create({
-         data: {
-           sessionId: currentSessionId,
-           role: 'ai',
-           content: '[EMERGENCY] SEEK IMMEDIATE MEDICAL ATTENTION. Call your local emergency number or proceed to the nearest hospital immediately.',
-           isEmergency: true
-         }
-       });
-       return NextResponse.json({
-         sessionId: currentSessionId,
-         reply: '[EMERGENCY] SEEK IMMEDIATE MEDICAL ATTENTION. Call your local emergency number or proceed to the nearest hospital immediately.',
-         isEmergency: true
-       });
+      await prisma.chatMessage.create({
+        data: {
+          sessionId: currentSessionId,
+          role: 'ai',
+          content: '[EMERGENCY] SEEK IMMEDIATE MEDICAL ATTENTION. Call your local emergency number or proceed to the nearest hospital immediately.',
+          isEmergency: true
+        }
+      });
+      return NextResponse.json({
+        sessionId: currentSessionId,
+        reply: '[EMERGENCY] SEEK IMMEDIATE MEDICAL ATTENTION. Call your local emergency number or proceed to the nearest hospital immediately.',
+        isEmergency: true
+      });
     }
 
     // Get chat history
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
     let aiReply = '';
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-2.5-flash-lite',
         contents: formattedHistory,
         config: {
           systemInstruction: systemInstruction
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
       });
 
       aiReply = response.text || 'I am sorry, I am unable to process that at the moment.';
-    } catch(err) {
+    } catch (err) {
       console.error('Gemini API Error', err);
       aiReply = 'I am currently experiencing technical difficulties. Please consult a healthcare professional for advice.';
     }
